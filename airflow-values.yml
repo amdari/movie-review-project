@@ -3,11 +3,11 @@ dags:
     enabled: true
     size: 1Gi
     storageClassName: nfs-client
-    accessModes: ReadWriteMany
+    accessMode: ReadWriteMany
 
   gitSync:
     enabled: true
-    repo: https://github.com/apache/airflow.git
+    repo: https://github.com/amdari/movie-review-project
     branch: master
     rev: HEAD
     depth: 1
