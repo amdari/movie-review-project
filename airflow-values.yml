@@ -1,0 +1,23 @@
+dags:
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClassName: nfs-client
+    accessModes: ReadWriteMany
+
+  gitSync:
+    enabled: true
+    repo: https://github.com/apache/airflow.git
+    branch: master
+    rev: HEAD
+    depth: 1
+    maxFailures: 0
+    subPath: "dags"
+
+logs:
+
+  persistence:
+    # Enable persistent volume for storing logs
+    enabled: true
+    size: 1Gi
+    storageClassName: nfs-client

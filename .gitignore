@@ -1,0 +1,5 @@
+*.tfvars
+*.tfstate*
+terraform/user-behaviour-project-00cd113a32c0.json
+*.lock.hcl
+.terraform/
