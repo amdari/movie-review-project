@@ -34,3 +34,5 @@ with DAG(
     )
 
     end_workflow = EmptyOperator(task_id='end_workflow')
+
+start_workflow >> [verify_today_movie_review, verify_today_log_review] >> end_workflow
