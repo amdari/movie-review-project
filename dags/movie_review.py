@@ -19,11 +19,11 @@ GCP_REGION = 'us-central1'
 DATAPROC_CLUSTER_CONFIG = ClusterGenerator(
     project_id=GCP_PROJECT_ID,
     zone='us-central1-a',
-    master_machine_type='n2-standard-2',
+    master_machine_type='n2-standard-1',
     master_disk_size=32,
-    worker_machine_type='n2-standard-2',
+    worker_machine_type='n1-standard-1',
     worker_disk_size=32,
-    num_workers=1,
+    num_workers=2,
     idle_delete_ttl=1200,
     optional_components=['JUPYTER']
 ).make()
