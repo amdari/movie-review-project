@@ -23,7 +23,7 @@ DATAPROC_CLUSTER_CONFIG = ClusterGenerator(
     master_disk_size=32,
     worker_machine_type='n2-standard-2',
     worker_disk_size=32,
-    num_workers=2,
+    num_workers=1,
     idle_delete_ttl=1200,
     optional_components=['JUPYTER']
 ).make()
