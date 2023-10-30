@@ -25,7 +25,8 @@ DATAPROC_CLUSTER_CONFIG = ClusterGenerator(
     worker_disk_size=32,
     num_workers=2,
     idle_delete_ttl=1200,
-    optional_components=['JUPYTER']
+    optional_components=['JUPYTER'],
+    enable_component_gateway=True
 ).make()
 
 
@@ -97,3 +98,4 @@ with DAG(
     >> [create_dataproc_cluster, continue_pipeline]
     >> end_workflow
 )
+
