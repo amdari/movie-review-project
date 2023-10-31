@@ -22,7 +22,7 @@ LOAD_TO_BIGQUERY_JOB_URI = f'gs://{GCS_BUCKET_NAME}/pyspark/movie_review_analyti
 def form_pyspark_job(job_file_uri):
     PYSPARK_JOB = dict(
         reference=dict(project_id=GCP_PROJECT_ID),
-        placement=dict(cluster_name=CLUSTER_NAME),
+        placement=dict(cluster_name=DATAPROC_CLUSTER_NAME),
         pyspark_job=dict(main_python_file_uri=job_file_uri)
     )
 
