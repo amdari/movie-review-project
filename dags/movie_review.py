@@ -1,5 +1,6 @@
 import google
 from airflow import DAG
+from airflow.utils.trigger_rule import TriggerRule
 from airflow.utils.dates import days_ago
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import BranchPythonOperator
@@ -23,7 +24,10 @@ def form_pyspark_job(job_file_uri):
     PYSPARK_JOB = dict(
         reference=dict(project_id=GCP_PROJECT_ID),
         placement=dict(cluster_name=DATAPROC_CLUSTER_NAME),
-        pyspark_job=dict(main_python_file_uri=job_file_uri)
+        pyspark_job=dict(
+            main_python_file_uri=job_file_uri,
+            jar_file_uris=["gs://spark-lib/bigquery/spark-bigquery-with-dependencies_2.12-0.33.0.jar"]
+        )
     )
 
     return PYSPARK_JOB
@@ -86,7 +90,8 @@ with DAG(
             cluster_name=DATAPROC_CLUSTER_NAME,
             project_id=GCP_PROJECT_ID,
             region=GCP_REGION
-        )
+        ),
+        trigger_rule=TriggerRule.ALL_SUCCESS,
     )
 
     continue_pipeline = EmptyOperator(task_id='continue_pipeline')
@@ -102,7 +107,7 @@ with DAG(
     )
 
 
-    continue_workflow = EmptyOperator(task_id='continue_workflow')
+    continue_workflow = EmptyOperator(task_id='continue_workflow', trigger_rule=TriggerRule.ONE_SUCCESS)
 
     submit_log_review_job = DataprocSubmitJobOperator(
         task_id="submit_log_review_job",

@@ -3,9 +3,6 @@ from pyspark.sql.functions import array_contains, when, col
 from pyspark.ml import Pipeline
 from pyspark.sql import SparkSession
 
-
-spark = SparkSession.builder.appName("ProcessMovieReview").getOrCreate()
-
 BUCKET_NAME = 'movie-review-bucket'
 MOVIE_REVIEW_OBJECT_KEY = 'movie_review.csv'
 
@@ -42,13 +39,24 @@ stopwords = [
     'although', 'beside', 'four', 'whereupon', 'then'
 ]
 
-tokenizer = Tokenizer(inputCol='review_str', outputCol='tokens')
-stopwords_remover = StopWordsRemover(inputCol='tokens', outputCol='words', stopWords=stopwords)
-pipeline = Pipeline(stages=[tokenizer, stopwords_remover])
-moviedf = pipeline.fit(df).transform(df)
+try:
+    print("Starting processing...")
+    spark = SparkSession.builder.appName("ProcessMovieReview").getOrCreate()
+    df = spark.read.csv(f'gs://{BUCKET_NAME}/{MOVIE_REVIEW_OBJECT_KEY}', inferSchema=True, header=True, sep=',')
 
-moviedf = moviedf.withColumn('positive_review', when(col('positive_review') == True, 1).otherwise(0))
+    tokenizer = Tokenizer(inputCol='review_str', outputCol='tokens')
+    stopwords_remover = StopWordsRemover(inputCol='tokens', outputCol='words', stopWords=stopwords)
+    pipeline = Pipeline(stages=[tokenizer, stopwords_remover])
+    moviedf = pipeline.fit(df).transform(df)
 
-moviedf = moviedf.withColumn('positive_review', when(col('positive_review') == True, 1).otherwise(0))
-moviedf = moviedf.selectExpr("cid AS user_id", "positive_review", "id_review AS review_id")
-moviedf.coalesce(1).write.csv(f'gs://{BUCKET_NAME}-staging/movie_review/', mode='append')
+    moviedf = moviedf.withColumn('positive_review', array_contains(moviedf["words"], "good"))
+
+    moviedf = moviedf.withColumn('positive_review', when(col('positive_review') == True, 1).otherwise(0))
+    moviedf = moviedf.selectExpr("cid AS user_id", "positive_review", "id_review AS review_id")
+    moviedf.coalesce(1).write.csv(f'gs://{BUCKET_NAME}-staging/movie_review/', mode='append')
+
+    spark.stop()
+except Exception as e:
+    print("An Error occured...")
+    raise e
+    print(e)
