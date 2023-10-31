@@ -34,3 +34,9 @@ module "kubernetes_cluster" {
   project_id = var.project_id
 }
 
+
+module "bigquery_dwh" {
+  source            = "./modules/bigquery"
+  project_id        = var.project_id
+  dataset_file_path = "${path.module}/resources/dataset.json"
+}
